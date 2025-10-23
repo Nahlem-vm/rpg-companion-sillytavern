@@ -2,7 +2,7 @@
 
 **Objective:** Implement an automatic image generation feature within the `rpg-companion-sillytavern` SillyTavern extension. This feature will leverage the extension's "Separate Mode" API call to generate image prompts based on tracked data and user configuration, then trigger SillyTavern's built-in image generation (`/sd` command).
 
-**Context:** The RPG Companion extension tracks character stats, scene info (Info Box), and character thoughts. In "Separate Mode," it makes a second API call after the main chat reply to update these trackers. We will enhance this second call to also generate an image prompt and trigger the image generation.
+**Context:** The RPG Companion extension tracks character stats, scene info (Info Box), and character thoughts. In "Separate Mode," it makes a second API call after the main chat reply to update these trackers. We will enhance this second call to also generate an image prompt and trigger the image generation. Read the auto-image-gen_extension_example.md to understand how it can be done. We will use the same approach of using a pic tag `<pic prompt="...">` while the whole prompt must be encapsulated within tags `<image_generation>` and `</image_generation>`.
 
 **Core Requirements:**
 
@@ -34,29 +34,6 @@
 3.  **Documentation:** Log all code alterations in a `changes.md` file with explanations.
 4.  **Due Diligence:** Before finalizing, re-read this document, your `changes.md`, and the modified code. Ensure all requirements are met. Log findings in `due_diligence.md`.
 
-**Key Files to Modify:**
-
-* `src/core/state.js`: Add new state variables for the image generation settings (toggle state, prompts, regex, insertion type).
-* `src/core/persistence.js`: Ensure new settings are loaded and saved correctly within `extensionSettings`.
-* `template.html`: Add the new HTML elements for the settings UI within `#rpg-settings-popup`, ensuring conditional visibility.
-* `index.js`:
-    * Add event listeners for the new settings UI elements.
-    * Implement logic to show/hide the image generation settings based on `generationMode` and `useSeparatePreset` changes.
-    * Handle the "Edit" button logic for the main prompt textarea.
-* `src/systems/generation/promptBuilder.js`: Modify `generateSeparateUpdatePrompt` (or relevant function constructing the prompt for the second API call). It should conditionally append the image generation instructions (including custom physical description and rules from settings) when the feature is enabled. Use SillyTavern macros like `{{user}}`, `{{char}}`, `{{persona}}` where appropriate in the prompt instructions if needed (though the refined prompt aims to avoid direct reliance if possible).
-* `src/systems/generation/apiClient.js`: Modify the `updateRPGData` function:
-    * Check `extensionSettings` if auto image generation is enabled.
-    * If yes, ensure the correct prompt is fetched/built (using the modified `promptBuilder`).
-    * After `generateRaw` returns, parse the response:
-        * Extract tracker data (as currently done).
-        * Use the regex from settings (`extensionSettings.imageGenRegex`) to find the `<pic prompt="...">` tag and extract the prompt string.
-        * If a prompt is found:
-            * Call `executeSlashCommandsOnChatInput` with `/sd ${extractedPrompt}` and appropriate options (likely `{ quiet: true }` if inserting inline, potentially `{ quiet: false }` if creating a new message, though `/sd` might handle this automatically - check behavior).
-            * Handle the result (expected to be an image URL or similar identifier).
-            * Based on `extensionSettings.imageInsertionType`:
-                * If 'inline': Use `appendMediaToMessage(message, messageElement)` (requires getting the last assistant message object and its corresponding DOM element). You might need to adapt logic from `st-image-auto-generation/index.js` `handleIncomingMessage` function.
-                * If 'new': You might need to use a function like `addMessage` or `sendSystemMessage` (investigate `script.js` or context functions) to create a new message entry containing just the image. The `/sd` command itself might create the message if `quiet: false` is used; verify this behavior.
-
 **Essential SillyTavern Concepts & Functions (Explain these in implementation):**
 
 * **`extensionSettings` (in `src/core/state.js`):** The primary object storing user configuration for the extension. Persisted via `power_user.extensions[extensionName]`.
@@ -71,9 +48,10 @@
 * **`updateMessageBlock` (imported from `script.js`):** Function used by `st-image-auto-generation` to redraw a specific message block in the UI, necessary if you directly modify the `.mes` content (like in replace mode). Takes the message index and the modified message object.
 * **Chat Structure:** `context.chat` is an array of message objects. The last message is `context.chat[context.chat.length - 1]`. Messages have properties like `is_user` (boolean), `mes` (string content), `extra` (object for metadata, where images are stored for inline display, e.g., `extra.image_swipes`, `extra.image`).
 
-**Refined Image Generation Prompt (for `promptBuilder.js`):**
+**Image Generation Prompt (for `promptBuilder.js`):**
 
 ```
+<image_generation>
 [IMAGE PROMPT GENERATION PROTOCOL]
 
 This instructs the second API call (separate mode) on generating an SD prompt. Prompts mix natural language and tags.
@@ -145,15 +123,7 @@ LoRAs: Append character/custom LoRAs (Rule 1 / Custom Rules).
 <pic prompt="1girl, looking at viewer, [Verbatim Physical Description], She's ((sitting:1.2)) on a wooden tavern stool, (legs crossed:1.1), full body shot, wearing [Key Clothing Items], dimly lit tavern, wooden beams overhead, faint smell of ale, nighttime, <lora:CharacterLora:0.8>, [Custom LoRAs]">
 
 CRITICAL: The final image tag MUST be inserted inline at the end of your generated tracker block as: <pic prompt="[FINAL PROMPT GOES HERE]">
+</image_generation>
 ```
 
 **Final Steps:** Implement the changes, re-read the code and do your due dilligence, commit the changes to a branch so that the user can test in their local SillyTavern instance, document changes in `changes.md`, and perform final checks for `due_diligence.md`.
-
-**Due Diligence:** The rules below are to be re-read and followed at every request:
-1. Any existing code in the rpg-companion-sillytavern extension is verbatim unless something needs to be changed to accomodade the feature. The code works as is, any alteration might cause problems. As such, there's no need to alter anything that doesn't need to.
-
-2. Anything that must be altered, must preserve any functions/wording originally as much as possible.
-
-3. Any alterations must be documented within a markdown log with proper explanation of why it was done.
-
-4. Before delivering any results, a due dilligence must be done. The repository and diffs must be re-read, alongside the agents.md, any other markdown create during the creation of the feature and correlated with what was asked. Any omission or incongruency must be logged and explained within a proper due_dilligence.md with timestamps
