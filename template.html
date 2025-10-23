@@ -231,6 +231,41 @@
                     Separate mode only. When enabled, tracker generation will use the model from the "RPG Companion Trackers" preset instead of your main API model. The preset will be switched automatically during generation and restored afterward. Select the desired model in that preset and make sure the "Bind presets to API connections" toggle is on (next to the import/export preset buttons).
                 </small>
 
+                <!-- Auto Image Generation Settings -->
+                <div id="rpg-auto-image-generation-settings" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rpg-border);">
+                    <h5><i class="fa-solid fa-image" aria-hidden="true"></i> Auto Image Generation</h5>
+                    <label class="checkbox_label">
+                        <input type="checkbox" id="rpg-enable-auto-image-generation" />
+                        <span>Enable Auto Image Generation</span>
+                    </label>
+                    <div id="rpg-auto-image-generation-options">
+                        <div class="rpg-setting-row">
+                            <label for="rpg-auto-image-main-prompt">Main Prompt Instructions:</label>
+                            <button id="rpg-edit-main-prompt-btn" class="rpg-btn-edit">Edit</button>
+                            <textarea id="rpg-auto-image-main-prompt" class="rpg-textarea" readonly></textarea>
+                        </div>
+                        <div class="rpg-setting-row">
+                            <label for="rpg-auto-image-custom-physical-description">Custom Physical Description:</label>
+                            <textarea id="rpg-auto-image-custom-physical-description" class="rpg-textarea"></textarea>
+                        </div>
+                        <div class="rpg-setting-row">
+                            <label for="rpg-auto-image-custom-user-rules">Custom User Rules:</label>
+                            <textarea id="rpg-auto-image-custom-user-rules" class="rpg-textarea"></textarea>
+                        </div>
+                        <div class="rpg-setting-row">
+                            <label for="rpg-auto-image-insertion-mode">Image Insertion:</label>
+                            <select id="rpg-auto-image-insertion-mode" class="rpg-select">
+                                <option value="Create New Message">Create New Message</option>
+                                <option value="Insert Inline (Last Message)">Insert Inline (Last Message)</option>
+                            </select>
+                        </div>
+                        <div class="rpg-setting-row">
+                            <label for="rpg-auto-image-prompt-tag-regex">Prompt Tag Regex:</label>
+                            <input type="text" id="rpg-auto-image-prompt-tag-regex" class="rpg-input" />
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Clear Cache Button -->
                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rpg-border);">
                     <button id="rpg-clear-cache" class="rpg-btn-clear-cache">

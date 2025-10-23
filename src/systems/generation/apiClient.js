@@ -3,10 +3,11 @@
  * Handles API calls for RPG tracker generation
  */
 
-import { generateRaw, chat } from '../../../../../../../script.js';
+import { generateRaw, chat, appendMediaToMessage, updateChat } from '../../../../../../../script.js';
 import { executeSlashCommandsOnChatInput } from '../../../../../../../scripts/slash-commands.js';
 import {
     extensionSettings,
+    addDebugLog,
     lastGeneratedData,
     committedTrackerData,
     isGenerating,
@@ -68,6 +69,27 @@ async function switchToPreset(presetName) {
     }
 }
 
+async function handleImageGeneration(imagePrompt) {
+    const result = await executeSlashCommandsOnChatInput(`/sd ${imagePrompt}`, { quiet: true });
+    if (result && result.pipe) {
+        const imageUrl = result.pipe;
+        if (extensionSettings.autoImageInsertionMode === 'Create New Message') {
+            const newMessage = {
+                mes: `<img src="${imageUrl}">`,
+                is_user: false,
+                is_name: true,
+                send_date: Date.now(),
+            };
+            chat.push(newMessage);
+            updateChat();
+        } else {
+            const lastMessage = chat[chat.length - 1];
+            if (lastMessage && !lastMessage.is_user) {
+                appendMediaToMessage(imageUrl, lastMessage.extra.messageId);
+            }
+        }
+    }
+}
 
 /**
  * Updates RPG tracker data using separate API call (separate mode only).
@@ -130,6 +152,17 @@ export async function updateRPGData(renderUserStats, renderInfoBox, renderThough
             const parsedData = parseResponse(response);
             // console.log('[RPG Companion] Parsed data:', parsedData);
             // console.log('[RPG Companion] parsedData.userStats:', parsedData.userStats ? parsedData.userStats.substring(0, 100) + '...' : 'null');
+
+            if (extensionSettings.enableAutoImageGeneration) {
+                const regex = new RegExp(extensionSettings.autoImagePromptTagRegex, 'g');
+                const match = regex.exec(response);
+                if (match && match[1]) {
+                    const imagePrompt = match[1];
+                    handleImageGeneration(imagePrompt);
+                } else {
+                    addDebugLog('Auto-Image-Gen: No <pic> tag found in response.');
+                }
+            }
 
             // DON'T update lastGeneratedData here - it should only reflect the data
             // from the assistant message the user replied to, not auto-generated updates

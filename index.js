@@ -148,6 +148,12 @@ import {
 // (setupMobileToggle, constrainFabToViewport, setupMobileTabs, removeMobileTabs,
 //  setupMobileKeyboardHandling, setupContentEditableScrolling)
 
+function updateAutoImageGenerationVisibility() {
+    const { generationMode, useSeparatePreset } = extensionSettings;
+    const shouldShow = generationMode === 'separate' && useSeparatePreset;
+    $('#rpg-auto-image-generation-settings').toggle(shouldShow);
+}
+
 /**
  * Adds the extension settings to the Extensions tab.
  */
@@ -261,10 +267,50 @@ async function initUI() {
         extensionSettings.generationMode = String($(this).val());
         saveSettings();
         updateGenerationModeUI();
+        updateAutoImageGenerationVisibility();
     });
 
     $('#rpg-use-separate-preset').on('change', function() {
         extensionSettings.useSeparatePreset = $(this).prop('checked');
+        saveSettings();
+        updateAutoImageGenerationVisibility();
+    });
+
+    // Auto Image Generation Settings
+    $('#rpg-enable-auto-image-generation').on('change', function() {
+        extensionSettings.enableAutoImageGeneration = $(this).prop('checked');
+        saveSettings();
+    });
+
+    $('#rpg-edit-main-prompt-btn').on('click', function() {
+        const textarea = $('#rpg-auto-image-main-prompt');
+        const isReadonly = textarea.prop('readonly');
+        textarea.prop('readonly', !isReadonly);
+        $(this).text(isReadonly ? 'Save' : 'Edit');
+    });
+
+    $('#rpg-auto-image-main-prompt').on('change', function() {
+        extensionSettings.autoImageMainPrompt = $(this).val();
+        saveSettings();
+    });
+
+    $('#rpg-auto-image-custom-physical-description').on('change', function() {
+        extensionSettings.autoImageCustomPhysicalDescription = $(this).val();
+        saveSettings();
+    });
+
+    $('#rpg-auto-image-custom-user-rules').on('change', function() {
+        extensionSettings.autoImageCustomUserRules = $(this).val();
+        saveSettings();
+    });
+
+    $('#rpg-auto-image-insertion-mode').on('change', function() {
+        extensionSettings.autoImageInsertionMode = $(this).val();
+        saveSettings();
+    });
+
+    $('#rpg-auto-image-prompt-tag-regex').on('change', function() {
+        extensionSettings.autoImagePromptTagRegex = $(this).val();
         saveSettings();
     });
 
@@ -475,9 +521,18 @@ async function initUI() {
     $('#rpg-custom-highlight').val(extensionSettings.customColors.highlight);
     $('#rpg-generation-mode').val(extensionSettings.generationMode);
 
+    // Populate auto image generation settings
+    $('#rpg-enable-auto-image-generation').prop('checked', extensionSettings.enableAutoImageGeneration);
+    $('#rpg-auto-image-main-prompt').val(extensionSettings.autoImageMainPrompt);
+    $('#rpg-auto-image-custom-physical-description').val(extensionSettings.autoImageCustomPhysicalDescription);
+    $('#rpg-auto-image-custom-user-rules').val(extensionSettings.autoImageCustomUserRules);
+    $('#rpg-auto-image-insertion-mode').val(extensionSettings.autoImageInsertionMode);
+    $('#rpg-auto-image-prompt-tag-regex').val(extensionSettings.autoImagePromptTagRegex);
+
     updatePanelVisibility();
     updateSectionVisibility();
     updateGenerationModeUI();
+    updateAutoImageGenerationVisibility();
     applyTheme();
     applyPanelPosition();
     toggleCustomColors();

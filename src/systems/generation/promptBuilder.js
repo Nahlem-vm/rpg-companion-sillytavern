@@ -382,6 +382,13 @@ export function generateSeparateUpdatePrompt() {
     instructionMessage += generateRPGPromptText().replace('start your response with', 'respond with');
     instructionMessage += `Provide ONLY the requested data in the exact formats specified above. Do not include any roleplay response, other text, or commentary. Remember, all bracketed placeholders (e.g., [Location], [Mood Emoji]) MUST be replaced with actual content without the square brackets.`;
 
+    if (extensionSettings.enableAutoImageGeneration) {
+        let imagePrompt = extensionSettings.autoImageMainPrompt;
+        imagePrompt = imagePrompt.replace('[custom physical description must be inserted here]', extensionSettings.autoImageCustomPhysicalDescription);
+        imagePrompt = imagePrompt.replace('[CUSTOM USER PROMPT RULES]', extensionSettings.autoImageCustomUserRules);
+        instructionMessage += `\n\n${imagePrompt}`;
+    }
+
     messages.push({
         role: 'user',
         content: instructionMessage
