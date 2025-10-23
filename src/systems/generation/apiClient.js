@@ -85,7 +85,7 @@ async function handleImageGeneration(imagePrompt) {
         } else {
             const lastMessage = chat[chat.length - 1];
             if (lastMessage && !lastMessage.is_user) {
-                appendMediaToMessage(imageUrl, lastMessage.extra.messageId);
+                appendMediaToMessage(imageUrl, lastMessage._id);
             }
         }
     }
