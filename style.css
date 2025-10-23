@@ -243,90 +243,6 @@ body:has(.rpg-panel.rpg-position-left) #sheld {
     font-size: 1.3vw;
 }
 
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-/* Only apply animations when enabled */
-.rpg-panel.rpg-animations-enabled .rpg-stat-fill {
-    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rpg-panel.rpg-animations-enabled .rpg-stat-bar {
-    transition: all 0.3s ease;
-}
-
-.rpg-panel.rpg-animations-enabled .rpg-info-content,
-.rpg-panel.rpg-animations-enabled .rpg-thoughts-content {
-    transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.rpg-panel.rpg-animations-enabled .rpg-info-line {
-    animation: slideInFromLeft 0.5s ease-out backwards;
-}
-
-.rpg-panel.rpg-animations-enabled .rpg-info-line:nth-child(1) { animation-delay: 0.1s; }
-.rpg-panel.rpg-animations-enabled .rpg-info-line:nth-child(2) { animation-delay: 0.2s; }
-.rpg-panel.rpg-animations-enabled .rpg-info-line:nth-child(3) { animation-delay: 0.3s; }
-.rpg-panel.rpg-animations-enabled .rpg-info-line:nth-child(4) { animation-delay: 0.4s; }
-.rpg-panel.rpg-animations-enabled .rpg-info-line:nth-child(5) { animation-delay: 0.5s; }
-
-.rpg-panel.rpg-animations-enabled .rpg-thoughts-overlay {
-    animation: fadeInScale 0.6s ease-out;
-}
-
-.rpg-panel.rpg-animations-enabled .rpg-mood-value {
-    transition: all 0.3s ease;
-}
-
-.rpg-panel.rpg-animations-enabled .rpg-dice-animation {
-    animation: none; /* Control separately */
-}
-
-/* Disable dice animation when animations are off */
-.rpg-panel:not(.rpg-animations-enabled) .rpg-dice-rolling i {
-    animation: none !important;
-}
-
-.rpg-panel:not(.rpg-animations-enabled) .rpg-dice-result-value {
-    animation: none !important;
-}
-
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-1.25rem);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* Add updating class for smooth content changes */
-.rpg-panel.rpg-animations-enabled .rpg-content-updating {
-    animation: contentPulse 0.5s ease;
-}
-
-@keyframes contentPulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.6;
-    }
-}
-
 .rpg-panel.rpg-position-top .rpg-classic-stat-btn {
     padding: 0.125em;
     font-size: 1.1vw;
@@ -336,32 +252,6 @@ body:has(.rpg-panel.rpg-position-left) #sheld {
 .rpg-panel.rpg-position-top .rpg-thoughts-content {
     font-size: 1.1vw;
     max-height: 9.375rem;
-}
-
-/* Custom Scrollbar */
-.rpg-panel::-webkit-scrollbar,
-#rpg-panel-content::-webkit-scrollbar,
-.rpg-content-box::-webkit-scrollbar {
-    width: 0.5rem;
-}
-
-.rpg-panel::-webkit-scrollbar-track,
-#rpg-panel-content::-webkit-scrollbar-track,
-.rpg-content-box::-webkit-scrollbar-track {
-    background: var(--rpg-accent);
-}
-
-.rpg-panel::-webkit-scrollbar-thumb,
-#rpg-panel-content::-webkit-scrollbar-thumb,
-.rpg-content-box::-webkit-scrollbar-thumb {
-    background: var(--rpg-highlight);
-    border-radius: 0.25em;
-}
-
-.rpg-panel::-webkit-scrollbar-thumb:hover,
-#rpg-panel-content::-webkit-scrollbar-thumb:hover,
-.rpg-content-box::-webkit-scrollbar-thumb:hover {
-    background: var(--rpg-border);
 }
 
 /* Game Container - Full height flex container */
